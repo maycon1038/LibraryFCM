@@ -1,12 +1,32 @@
 <resources>
-    <string name="app_name">LibraryFCM</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">Mensagem FCM</string>
+    <string name="action_settings">Definições</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
+    <string name="first_fragment_label">Primeiro Fragmento</string>
+    <string name="second_fragment_label">Segundo Fragmento</string>
+    <string name="next">próximo</string>
+    <string name="previous">anterior</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="hello_first_fragment">Olá primeiro fragmento</string>
+    <string name="hello_second_fragment">Olá segundo fragmento. Arg: %1$s</string>
+
+
+
+	<string name="quickstart_message">Clique no botão SUBSCRIBE TO WEATHER abaixo para se inscrever no tópico de clima. As mensagens enviadas para o tópico de clima serão recebidas. O botão LOG TOKEN registra o token de registro do FCM no logcat.</string>
+	<string name="subscribe_to_weather">Assine o Tempo</string>
+	<string name="log_token">Token de registro</string>
+
+	<string name="msg_subscribed">Inscrito no tópico do tempo</string>
+	<string name="msg_token_fmt" translatable="false">Token de registro do FCM: %s</string>
+
+	<string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+	<!--
+		This is the name that users will see when interacting with this channel.
+		It should describe the category of notifications that will be sent through this channel
+	 -->
+	<!-- [START fcm_default_icon_string] -->
+	<string name="default_notification_channel_name" translatable="true">tempo</string>
+	<!-- [END fcm_default_icon_string] -->
+	<string name="msg_subscribe_failed">Falha ao inscrever-se no tópico sobre clima</string>
+	<string name="fcm_message">Mensagem FCM</string>
 </resources>

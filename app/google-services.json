@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "872223013628",
+    "project_id": "mensagem-fcm",
+    "storage_bucket": "mensagem-fcm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:872223013628:android:1d72354ba20192cb163579",
+        "android_client_info": {
+          "package_name": "com.pmam.libraryfcm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "872223013628-08t9l6jeela18rlhrjle7d6pv6v8o693.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAgvMfvHK4JeN2INMk2x_U-pnaxBUBzfg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "872223013628-08t9l6jeela18rlhrjle7d6pv6v8o693.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

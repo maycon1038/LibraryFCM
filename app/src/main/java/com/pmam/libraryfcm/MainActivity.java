@@ -1,11 +1,15 @@
 package com.pmam.libraryfcm;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.view.View;
 
 import androidx.navigation.NavController;
@@ -22,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+	private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +34,29 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         setSupportActionBar(binding.toolbar);
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			// Create channel to show notifications.
+			String channelId  = getString(R.string.default_notification_channel_id);
+			String channelName = getString(R.string.default_notification_channel_name);
+			NotificationManager notificationManager =
+					getSystemService(NotificationManager.class);
+			notificationManager.createNotificationChannel(new NotificationChannel(channelId,
+					channelName, NotificationManager.IMPORTANCE_LOW));
+		}
+
+		if (getIntent().getExtras() != null) {
+			for (String key : getIntent().getExtras().keySet()) {
+				Object value = getIntent().getExtras().get(key);
+				Log.d(TAG, "Key: " + key + " Value: " + value);
+			}
+		}
+
+
+
+		NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
