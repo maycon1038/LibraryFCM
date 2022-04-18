@@ -37,7 +37,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 		// Check if message contains a data payload.
 		if (remoteMessage.getData().size() > 0) {
-			Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+			Log.d(TAG, "Carga útil de dados da mensagem: " + remoteMessage.getData());
 
 			if (/* Verifique se os dados precisam ser processados por um trabalho de longa duração */ true) {
 				// Para tarefas de longa duração (10 segundos ou mais), use o WorkManager.
@@ -51,11 +51,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 		// Check if message contains a notification payload.
 		if (remoteMessage.getNotification() != null) {
-			Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+			Log.d(TAG, "Corpo da notificação da mensagem: " + remoteMessage.getNotification().getBody());
 		}
 
-		// Also if you intend on generating your own notifications as a result of a received FCM
-		// message, here is where that should be initiated. See sendNotification method below.
+		// Além disso, se você pretende gerar suas próprias notificações como resultado de uma mensagem FCM recebida,
+		// aqui é onde isso deve ser iniciado. Veja o método sendNotification abaixo.
 	}
 	// [END receive_message]
 
@@ -72,11 +72,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 	 */
 	@Override
 	public void onNewToken(String token) {
-		Log.d(TAG, "Refreshed token: " + token);
+		Log.d(TAG, "Token atualizado: " + token);
 
-		// If you want to send messages to this application instance or
-		// manage this apps subscriptions on the server side, send the
-		// FCM registration token to your app server.
+		// Se você quiser enviar mensagens para essa instância do aplicativo
+		// ou gerenciar as assinaturas desse aplicativo no lado do servidor,
+		// envie o token de registro do FCM para o servidor do aplicativo.
 		sendRegistrationToServer(token);
 	}
 	// [END on_new_token]
@@ -100,15 +100,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 	}
 
 	/**
-	 * Persist token to third-party servers.
+	 * Persistir token para servidores de terceiros.
 	 *
-	 * Modify this method to associate the user's FCM registration token with any
-	 * server-side account maintained by your application.
+	 * Modifique este método para associar o token de registro do FCM do usuário a qualquer
+	 * conta do lado do servidor mantida pelo seu aplicativo.
 	 *
 	 * @param token The new token.
 	 */
 	private void sendRegistrationToServer(String token) {
 		// TODO: Implement this method to send token to your app server.
+		Log.d(TAG, token);
 	}
 
 	/**

@@ -5,8 +5,11 @@ import android.app.NotificationManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
@@ -17,6 +20,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.firebase.installations.FirebaseInstallations;
+import com.google.firebase.installations.InstallationTokenResult;
 import com.pmam.libraryfcm.databinding.ActivityMainBinding;
 
 import android.view.Menu;
@@ -35,6 +40,17 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
+
+
+		FirebaseInstallations.getInstance().getToken(true).addOnCompleteListener(task -> {
+			if (task.isSuccessful()) {
+				String token_firebase = task.getResult().getToken();
+				// AUTENTICANDO COM TOKEN FIREBASE
+				Log.d(TAG, token_firebase);
+				//setTokenFCM(ctx, token_firebase);
+
+			}
+		});
 
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
