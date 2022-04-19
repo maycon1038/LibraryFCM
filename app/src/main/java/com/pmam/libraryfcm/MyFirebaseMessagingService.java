@@ -1,14 +1,24 @@
 package com.pmam.libraryfcm;
 
+import static com.msm.themes.util.ActivityIsVisible.isActivityVisible;
+import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
+
+import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
@@ -16,12 +26,26 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.pmam.fcm.notifications.GlobalNotificationBuilder;
+import com.pmam.fcm.notifications.NotificationDatabase;
+import com.pmam.fcm.notifications.NotificationUtil;
+import com.pmam.fcm.notifications.handlers.BigTextIntentService;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
+	private NotificationManagerCompat mNotificationManagerCompat;
 	private static final String TAG = "MyFirebaseMsgService";
-
+	private static final String NOTIFICATION_CHANNEL_TESTE_ID = "101";
+	private static final String NOTIFICATION_CHANNEL_TESTE = "teste";
+	private int currentChannel;
 	/**
 	 * Called when message is received.
 	 *
@@ -44,7 +68,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 				scheduleJob();
 			} else {
 				// Lidar com a mensagem em 10 segundos
-				handleNow();
+				handleNow(remoteMessage.getData().get("title"), remoteMessage.getData().get("body"));
 			}
 
 		}
@@ -93,10 +117,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 	}
 
 	/**
-	 * Handle time allotted to BroadcastReceivers.
+	 * Lidar com o tempo alocado para BroadcastReceivers.
 	 */
-	private void handleNow() {
+	private void handleNow(String title, String msm) {
 		Log.d(TAG, "A tarefa de curta duração é feita.");
+		String myFormat = "dd/MM/yyyy"; //In which you need put here
+		final SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("pt", "BR"));
+		Intent notifyIntent = new Intent(this, MainActivity.class);
+		NotificationDatabase.BigTextStyleReminderAppData bigTextStyleReminderAppData = NotificationDatabase.getBigTextStyleData(title, msm, sdf.format(new Date()), NOTIFICATION_CHANNEL_TESTE_ID, NOTIFICATION_CHANNEL_TESTE);
+		generateBigTextStyleNotification(notifyIntent, bigTextStyleReminderAppData);
+
 	}
 
 	/**
@@ -145,5 +175,114 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 		}
 
 		notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+	}
+
+	private void generateBigTextStyleNotification(Intent notifyIntent, NotificationDatabase.BigTextStyleReminderAppData bigTextStyleReminderAppData) {
+		mNotificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+		// 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
+		String notificationChannelId = NotificationUtil.createNotificationChannel(this, bigTextStyleReminderAppData);
+
+		// 2. Build the BIG_TEXT_STYLE.
+		NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
+				.bigText(bigTextStyleReminderAppData.getBigText())
+				.setBigContentTitle(bigTextStyleReminderAppData.getBigContentTitle())
+				.setSummaryText(bigTextStyleReminderAppData.getSummaryText());
+
+		notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		//acção ao clicar na notificação
+		PendingIntent notifyPendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		//ação ao clicar no botao visualizar
+		PendingIntent snoozePendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
+		NotificationCompat.Action snoozeAction = new NotificationCompat.Action.Builder(R.drawable.ic_eye, "Visualizar", snoozePendingIntent).build();
+
+		// Dismiss Action - 1 opacao.
+		Intent dismissIntent = new Intent(this, BigTextIntentService.class);
+		dismissIntent.setAction(BigTextIntentService.ACTION_DISMISS);
+
+		PendingIntent dismissPendingIntent = PendingIntent.getService(this, 0, dismissIntent, 0);
+
+
+		NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();
+
+		NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+		GlobalNotificationBuilder.setNotificationCompatBuilderInstance(notificationCompatBuilder);
+
+		@SuppressLint("WrongConstant") Notification notification = notificationCompatBuilder
+				.setStyle(bigTextStyle)
+				.setContentTitle(bigTextStyleReminderAppData.getContentTitle())
+				.setContentText(bigTextStyleReminderAppData.getContentText())
+				.setSmallIcon(R.mipmap.ic_launcher)
+				.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+				.setContentIntent(notifyPendingIntent)
+				.setDefaults(NotificationCompat.DEFAULT_ALL)
+				.setColor(ContextCompat.getColor(getApplicationContext(), com.msm.themes.R.color.primaryColorAmber))
+				.setCategory(Notification.CATEGORY_MESSAGE)
+				.setPriority(bigTextStyleReminderAppData.getPriority())
+				.setVisibility(bigTextStyleReminderAppData.getChannelLockscreenVisibility())
+				.addAction(snoozeAction)
+				.addAction(dismissAction)
+				.build();
+
+		mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
+	}
+
+
+	private void generateBigImageStyleNotification(Intent notifyIntent, NotificationDatabase.BigPictureStyleSocialAppData bigPictureStyleReminderAppData) {
+		mNotificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+		// 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
+		String notificationChannelId = NotificationUtil.createNotificationChannel(this, bigPictureStyleReminderAppData);
+
+		// 1. Build the BIG_PICTURE_STYLE
+		NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle()
+				.bigPicture(bigPictureStyleReminderAppData.getmBigImage())
+				.setBigContentTitle(bigPictureStyleReminderAppData.getBigContentTitle())
+				.setSummaryText(bigPictureStyleReminderAppData.getSummaryText());
+
+		// 2. Set up main Intent for notification
+
+		notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		//acção ao clicar na notificação
+		PendingIntent notifyPendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		//ação ao clicar no botao visualizar
+		PendingIntent snoozePendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
+		NotificationCompat.Action snoozeAction = new NotificationCompat.Action.Builder(R.drawable.ic_eye, "Visualizar", snoozePendingIntent).build();
+
+		// Dismiss Action - 1 opacao.
+		Intent dismissIntent = new Intent(this, BigTextIntentService.class);
+		dismissIntent.setAction(BigTextIntentService.ACTION_DISMISS);
+
+		PendingIntent dismissPendingIntent = PendingIntent.getService(this, 0, dismissIntent, 0);
+
+
+		NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();
+
+		NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+		GlobalNotificationBuilder.setNotificationCompatBuilderInstance(notificationCompatBuilder);
+
+		@SuppressLint("WrongConstant") Notification notification = notificationCompatBuilder
+				.setStyle(bigPictureStyle)
+				.setContentTitle(bigPictureStyleReminderAppData.getContentTitle())
+				.setContentText(bigPictureStyleReminderAppData.getContentText())
+				.setSmallIcon(R.mipmap.ic_launcher)
+				.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+				.setContentIntent(notifyPendingIntent)
+				.setColor(getResources().getColor(com.msm.themes.R.color.primaryColorAmber))
+				.addAction(dismissAction)
+				.addAction(snoozeAction)
+				.setCategory(Notification.CATEGORY_SOCIAL)
+				.setPriority(bigPictureStyleReminderAppData.getPriority())
+				.setVisibility(bigPictureStyleReminderAppData.getChannelLockscreenVisibility()).build();
+
+
+		mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
+	}
+
+	private String[] getOpmIds(String opm_ids){
+		String opmsIds = opm_ids;
+		opmsIds = opm_ids.replace("[", "");
+		opmsIds = opmsIds.replace("]", "");
+		return opmsIds.split(",");
 	}
 }

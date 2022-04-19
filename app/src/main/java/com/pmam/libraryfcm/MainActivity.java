@@ -1,5 +1,7 @@
 package com.pmam.libraryfcm;
 
+import static com.msm.themes.util.themePreferencia.setProvider;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 					@Override
 					public void onComplete(@NonNull Task<String> task) {
 						if (!task.isSuccessful()) {
-							Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+							Log.w(TAG, "Falha ao buscar o token de registro do FCM", task.getException());
 							return;
 						}
 
@@ -68,10 +70,8 @@ public class MainActivity extends AppCompatActivity {
 			// Create channel to show notifications.
 			String channelId  = getString(R.string.default_notification_channel_id);
 			String channelName = getString(R.string.default_notification_channel_name);
-			NotificationManager notificationManager =
-					getSystemService(NotificationManager.class);
-			notificationManager.createNotificationChannel(new NotificationChannel(channelId,
-					channelName, NotificationManager.IMPORTANCE_LOW));
+			NotificationManager notificationManager = getSystemService(NotificationManager.class);
+			notificationManager.createNotificationChannel(new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW));
 		}
 
 		if (getIntent().getExtras() != null) {
@@ -87,13 +87,10 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        binding.fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+				.setAction("Action", null).show());
+
+		setProvider(this, "com.pmam.libraryfcm");
     }
 
     @Override
