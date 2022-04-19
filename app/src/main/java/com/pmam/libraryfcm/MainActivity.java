@@ -22,10 +22,12 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.firebase.installations.FirebaseInstallations;
 import com.google.firebase.installations.InstallationTokenResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.pmam.libraryfcm.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,15 +44,24 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
 
 
-		FirebaseInstallations.getInstance().getToken(true).addOnCompleteListener(task -> {
-			if (task.isSuccessful()) {
-				String token_firebase = task.getResult().getToken();
-				// AUTENTICANDO COM TOKEN FIREBASE
-				Log.d(TAG, token_firebase);
-				//setTokenFCM(ctx, token_firebase);
+		FirebaseMessaging.getInstance().getToken()
+				.addOnCompleteListener(new OnCompleteListener<String>() {
+					@Override
+					public void onComplete(@NonNull Task<String> task) {
+						if (!task.isSuccessful()) {
+							Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+							return;
+						}
 
-			}
-		});
+						// Get new FCM registration token
+						String token = task.getResult();
+
+						// Log and toast
+						String msg = getString(R.string.msg_token_fmt, token);
+						Log.d(TAG, msg);
+						Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+					}
+				});
 
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
