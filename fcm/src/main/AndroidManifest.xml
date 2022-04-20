@@ -12,6 +12,9 @@
 		<service
 			android:name=".notifications.handlers.BigTextIntentService"
 			android:exported="false" />
+		<service
+			android:name=".notifications.handlers.BigPictureSocialIntentService"
+			android:exported="false" />
 
 	</application>
 

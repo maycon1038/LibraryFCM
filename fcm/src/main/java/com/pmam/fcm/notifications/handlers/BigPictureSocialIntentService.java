@@ -16,8 +16,8 @@ limitations under the License.
 package com.pmam.fcm.notifications.handlers;
 
 import static com.msm.themes.util.themePreferencia.getProvider;
-import static com.msm.themes.util.themePreferencia.setProvider;
 import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
+
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
@@ -26,8 +26,8 @@ import androidx.core.app.NotificationManagerCompat;
 
 
 /**
- * Asynchronously handles updating social app posts (and active Notification) with comments from
- * user. Notification for social app use BigPictureStyle.
+ * Lida de forma assíncrona com a atualização de postagens de aplicativos sociais (e notificação ativa) com comentários de
+ * do utilizador. Notificação para uso de aplicativos sociais BigPictureStyle.
  */
 public class BigPictureSocialIntentService extends IntentService {
 
@@ -38,6 +38,7 @@ public class BigPictureSocialIntentService extends IntentService {
 	/*public static final String ACTION_DISMISS = "br.com.pmam.copmam.notifications.handlers.action.DISMISS";
 	public static final String ARG_ACTION_DISMISS = "ACTION_DISMISS";*/
 	public static String ACTION_DISMISS;
+
 	public BigPictureSocialIntentService() {
 		super("BigPictureSocialIntentService");
 	}
@@ -56,8 +57,8 @@ public class BigPictureSocialIntentService extends IntentService {
 				handleActionDismiss();
 			}
 		}
-		Log.d(TAG, "onHandleIntent(): " + intent);
-		Log.d(TAG, "onHandleIntent(): "  );
+		Log.d(TAG, "ACTION_DISMISS(): " + ACTION_DISMISS);
+		Log.d(TAG, "provider(): " + provider);
 	}
 
 	private void handleActionDismiss() {

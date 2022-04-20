@@ -63,7 +63,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 		if (remoteMessage.getData().size() > 0) {
 			Log.d(TAG, "Carga útil de dados da mensagem: " + remoteMessage.getData());
 
-			if (/* Verifique se os dados precisam ser processados por um trabalho de longa duração */ true) {
+			if (/* Verifique se os dados precisam ser processados por um trabalho de longa duração */ false) {
 				// Para tarefas de longa duração (10 segundos ou mais), use o WorkManager.
 				scheduleJob();
 			} else {
@@ -109,11 +109,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 	 * Agende o trabalho assíncrono usando o WorkManager.
 	 */
 	private void scheduleJob() {
-		// [START dispatch_job]
-		OneTimeWorkRequest work = new OneTimeWorkRequest.Builder(MyWorker.class)
-				.build();
+		// [START executar trabalho]
+		OneTimeWorkRequest work = new OneTimeWorkRequest.Builder(MyWorker.class).build();
+
+
 		WorkManager.getInstance(this).beginWith(work).enqueue();
-		// [END dispatch_job]
+		// [END executar trabalho]
 	}
 
 	/**
