@@ -1,9 +1,12 @@
 package com.pmam.libraryfcm;
 
 import static com.msm.themes.util.themePreferencia.setProvider;
+import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -44,8 +47,10 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
+		setProvider(this, "com.pmam.libraryfcm");
 
-
+		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		manager.cancel(NOTIFICATION_ID);
 		FirebaseMessaging.getInstance().getToken()
 				.addOnCompleteListener(new OnCompleteListener<String>() {
 					@Override
@@ -64,15 +69,13 @@ public class MainActivity extends AppCompatActivity {
 						Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
 					}
 				});
-
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+		/*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			// Create channel to show notifications.
 			String channelId  = getString(R.string.default_notification_channel_id);
 			String channelName = getString(R.string.default_notification_channel_name);
 			NotificationManager notificationManager = getSystemService(NotificationManager.class);
 			notificationManager.createNotificationChannel(new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW));
-		}
+		}*/
 
 		if (getIntent().getExtras() != null) {
 			for (String key : getIntent().getExtras().keySet()) {
@@ -90,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         binding.fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 				.setAction("Action", null).show());
 
-		setProvider(this, "com.pmam.libraryfcm");
+
     }
 
     @Override
