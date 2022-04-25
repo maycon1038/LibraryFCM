@@ -7,7 +7,6 @@
 /captures
 .externalNativeBuild
 .cxx
-/gradle
 gradlew.bat
 local.properties
 gradlew
