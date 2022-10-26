@@ -3,10 +3,15 @@ package com.pmam.libraryfcm;
 import static com.msm.themes.util.themePreferencia.setProvider;
 import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
 
-import android.annotation.SuppressLint;
-import android.app.NotificationChannel;
+import android.Manifest;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.app.ActivityCompat;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -32,6 +37,7 @@ import com.pmam.libraryfcm.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.QuickContactBadge;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,6 +45,19 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 	private static final String TAG = "MainActivity";
+
+
+
+    // Você pode fazer a atribuição dentro de onAttach ou onCreate, ou seja, antes que a atividade seja exibida
+    private final ActivityResultLauncher<String> mPermissionPotNotification = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
+        if (result) {
+          /*  Intent intent = ImagePicker.getPickImageIntent(ctx, getProvider(ctx));
+            someActivityResultLauncher.launch(intent);*/
+        } else {
+            Toast.makeText(this, "Permissão negada!", Toast.LENGTH_SHORT).show();
+            //tg.LogD("onActivityResult: PERMISSION DENIED");
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,8 +109,24 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        binding.fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-				.setAction("Action", null).show());
+     /*   binding.fab.setOnClickListener(view ->
+                //Snackbar.make(view, "Substitua por sua própria ação", Snackbar.LENGTH_LONG)
+				.setAction("Action", null).show());*/
+
+        binding.fab.setOnClickListener(v -> {
+            if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                //  Intent intent = ImagePicker.getPickImageIntent(this,  getProvider(ctx));
+                if (Build.VERSION.SDK_INT >= 33) {
+                    mPermissionPotNotification.launch(Manifest.permission.POST_NOTIFICATIONS);
+                }else {
+                    Snackbar.make(v, "API < 33", Snackbar.LENGTH_SHORT)
+                            .setAction("oK", null).show();
+                }
+            }
+        });
+
+
+
 
 
     }

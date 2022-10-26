@@ -1,6 +1,5 @@
 package com.pmam.libraryfcm;
 
-import static com.msm.themes.util.ActivityIsVisible.isActivityVisible;
 import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
 
 import android.annotation.SuppressLint;
@@ -66,9 +65,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 			if (/* Verifique se os dados precisam ser processados por um trabalho de longa duração */ false) {
 				// Para tarefas de longa duração (10 segundos ou mais), use o WorkManager.
 				scheduleJob();
+			}else if (remoteMessage.getFrom().split("/topics/")[1].equals("TESTE")) {
+
+				updateMessageSEG(remoteMessage);
+
 			} else {
 				// Lidar com a mensagem em 10 segundos
-				handleNow(remoteMessage.getData().get("title"), remoteMessage.getData().get("body"));
+			 	handleNow(remoteMessage.getData().get("title"), remoteMessage.getData().get("body"));
 			}
 
 		}
@@ -112,7 +115,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 		// [START executar trabalho]
 		OneTimeWorkRequest work = new OneTimeWorkRequest.Builder(MyWorker.class).build();
 
-
 		WorkManager.getInstance(this).beginWith(work).enqueue();
 		// [END executar trabalho]
 	}
@@ -141,6 +143,31 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 	private void sendRegistrationToServer(String token) {
 		// TODO: Implement this method to send token to your app server.
 		Log.d(TAG, token);
+	}
+
+	private void updateMessageSEG(@NonNull RemoteMessage rm) {
+		if (rm.getData().containsKey("action")) {
+//            System.out.println("NOTIFY: "+rm.getData());
+			if (rm.getData().get("action").equals("evento_publicado") && rm.getData().get("qtdConfirmado").equals("0")){
+
+					String[] arrayOpms = getOpmIds(Objects.requireNonNull(rm.getData().get("opm_ids")));
+
+						String dateTimeEvento = rm.getData().get("dateTimeEvento");
+						dateTimeEvento = dateTimeEvento.split(" ")[0];
+						String[] dataEvento = dateTimeEvento.split("-");
+
+
+						Intent myIntent = new Intent(this, MainActivity.class);
+//                        myIntent.putExtra("idDocEvento", me.getIdDoc());
+						NotificationDatabase.BigTextStyleReminderAppData bigTextStyleReminderAppData = NotificationDatabase.getBigTextStyleData(
+								"SEG - Novo evento com vagas disponíveis",
+								dataEvento[2]+"/"+dataEvento[1]+"/"+dataEvento[0]+" - "+rm.getData().get("nomeEvento")+" - Clique para abrir o app",
+								"SEG EVENTOS", "3", "seg_evento");
+				generateBigTextStyleNotification(myIntent, bigTextStyleReminderAppData);
+
+
+			}
+		}
 	}
 
 	/**
