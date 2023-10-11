@@ -2,6 +2,7 @@ package com.pmam.libraryfcm;
 
 import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -9,12 +10,14 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -178,8 +181,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 	private void sendNotification(String messageBody) {
 		Intent intent = new Intent(this, MainActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-				PendingIntent.FLAG_ONE_SHOT);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_IMMUTABLE);
 
 		String channelId = getString(R.string.default_notification_channel_id);
 		Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -220,14 +222,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 		//acção ao clicar na notificação
 		PendingIntent notifyPendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		//ação ao clicar no botao visualizar
-		PendingIntent snoozePendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
+		PendingIntent snoozePendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_IMMUTABLE);
 		NotificationCompat.Action snoozeAction = new NotificationCompat.Action.Builder(R.drawable.ic_eye, "Visualizar", snoozePendingIntent).build();
 
 		// Dismiss Action - 1 opacao.
 		Intent dismissIntent = new Intent(this, BigTextIntentService.class);
 		dismissIntent.setAction(BigTextIntentService.ACTION_DISMISS);
 
-		PendingIntent dismissPendingIntent = PendingIntent.getService(this, 0, dismissIntent, 0);
+		PendingIntent dismissPendingIntent = PendingIntent.getService(this, 0, dismissIntent, PendingIntent.FLAG_IMMUTABLE);
 
 
 		NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();
@@ -252,6 +254,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 				.addAction(dismissAction)
 				.build();
 
+		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+			// TODO: Consider calling
+			//    ActivityCompat#requestPermissions
+			// here to request the missing permissions, and then overriding
+			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+			//                                          int[] grantResults)
+			// to handle the case where the user grants the permission. See the documentation
+			// for ActivityCompat#requestPermissions for more details.
+			return;
+		}
 		mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
 	}
 
@@ -273,14 +285,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 		//acção ao clicar na notificação
 		PendingIntent notifyPendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		//ação ao clicar no botao visualizar
-		PendingIntent snoozePendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
+		PendingIntent snoozePendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_IMMUTABLE);
 		NotificationCompat.Action snoozeAction = new NotificationCompat.Action.Builder(R.drawable.ic_eye, "Visualizar", snoozePendingIntent).build();
 
 		// Dismiss Action - 1 opacao.
 		Intent dismissIntent = new Intent(this, BigTextIntentService.class);
 		dismissIntent.setAction(BigTextIntentService.ACTION_DISMISS);
 
-		PendingIntent dismissPendingIntent = PendingIntent.getService(this, 0, dismissIntent, 0);
+		PendingIntent dismissPendingIntent = PendingIntent.getService(this, 0, dismissIntent, PendingIntent.FLAG_IMMUTABLE);
 
 
 		NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();
@@ -303,7 +315,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 				.setPriority(bigPictureStyleReminderAppData.getPriority())
 				.setVisibility(bigPictureStyleReminderAppData.getChannelLockscreenVisibility()).build();
 
-
+		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+			// TODO: Consider calling
+			//    ActivityCompat#requestPermissions
+			// here to request the missing permissions, and then overriding
+			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+			//                                          int[] grantResults)
+			// to handle the case where the user grants the permission. See the documentation
+			// for ActivityCompat#requestPermissions for more details.
+			return;
+		}
 		mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
 	}
 
