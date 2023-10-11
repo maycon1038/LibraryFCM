@@ -11,6 +11,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures{
+        dataBinding = true
+        viewBinding = true
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_18
         targetCompatibility JavaVersion.VERSION_18
@@ -22,14 +27,14 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation platform('com.google.firebase:firebase-bom:32.3.1')
-    implementation 'com.google.firebase:firebase-core:21.1.1'
-	implementation 'com.google.firebase:firebase-messaging'
-	implementation "androidx.work:work-runtime:2.8.1"
     implementation 'com.google.android.material:material:1.9.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment:2.5.3'
     implementation 'androidx.navigation:navigation-ui:2.5.3'
+    implementation platform('com.google.firebase:firebase-bom:32.3.1')
+    implementation 'com.google.firebase:firebase-core:21.1.1'
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation "androidx.work:work-runtime:2.8.1"
 	implementation 'com.github.maycon1038:LibraryThemes:3.1.7'
-	implementation project(path: ':fcm')
+    implementation project(path: ':fcm')
 }
