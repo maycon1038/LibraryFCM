@@ -19,36 +19,23 @@ package com.pmam.fcm.notifications.handlers;
 import static com.msm.themes.util.themePreferencia.getProvider;
 import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
 
-import android.app.IntentService;
-import android.content.Intent;
+import android.content.Context;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
-public class BigTextIntentService extends IntentService {
-
+public class BigTextIntentService extends Worker {
+	private static final String TAG = "BigPictureSocialIntentService";
 	/*
 	public static final String ARG_ACTION_DISMISS = "ACTION_DISMISS";*/
 	public static String ACTION_DISMISS;
-	public BigTextIntentService() {
-		super("BigTextIntentService");
+	public BigTextIntentService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+		super(context, workerParams);
 	}
 
-	@Override
-	protected void onHandleIntent(Intent intent) {
-
-
-		String provider = getProvider(this);
-		StringBuilder st = new StringBuilder();
-		st.append(provider);
-		st.append(".notifications.handlers.action.DISMISS");
-		ACTION_DISMISS = st.toString();
-		if (intent != null) {
-			String action = intent.getAction();
-			if (ACTION_DISMISS.equals(action)) {
-				handleActionDismiss();
-			}
-		}
-	}
 
 	private void handleActionDismiss() {
 		NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
@@ -56,4 +43,33 @@ public class BigTextIntentService extends IntentService {
 	}
 
 
+	@NonNull
+	@Override
+	public Result doWork() {
+		// Get the provider
+		String provider = getProvider(getApplicationContext());
+
+		// Build the action string
+		String action = new StringBuilder()
+				.append(provider)
+				.append(".notifications.handlers.action.DISMISS")
+				.toString();
+
+		// Check if the intent action matches the dismiss action
+		if (getInputData().getString("action").equals(action)) {
+			handleActionDismiss();
+		}
+		Log.d(TAG, "ACTION_DISMISS(): " + ACTION_DISMISS);
+		Log.d(TAG, "provider(): " + provider);
+		// Indicate success
+		return Result.success();
+	}
 }
+// Create a WorkRequest
+/*
+WorkRequest workRequest = new OneTimeWorkRequestBuilder<DismissNotificationWorker>()
+		.setInputData(workDataOf("action", ACTION_DISMISS))
+		.build();
+
+// Enqueue the WorkRequest
+WorkManager.getInstance(context).enqueue(workRequest);*/
