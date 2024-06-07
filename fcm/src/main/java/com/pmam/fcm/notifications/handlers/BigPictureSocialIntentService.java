@@ -43,23 +43,30 @@ public class BigPictureSocialIntentService extends Worker {
 
 	public BigPictureSocialIntentService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
 		super(context, workerParams);
+
 	}
-
-
 	private void handleActionDismiss() {
 		NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
 		notificationManagerCompat.cancel(NOTIFICATION_ID);
 	}
 
+
 	@NonNull
 	@Override
 	public Result doWork() {
-		String provider = getProvider(getApplicationContext());
-		StringBuilder st = new StringBuilder();
-		st.append(provider);
-		st.append(".notifications.handlers.action.DISMISS");
-		String action = getInputData().getString("action");
-		if (ACTION_DISMISS.equals(action)) {
+		// Get the provider
+		Context applicationContext = getApplicationContext();
+
+		String provider = getProvider(applicationContext);
+
+		// Build the action string
+		String action = new StringBuilder()
+				.append(provider)
+				.append(".notifications.handlers.action.DISMISS")
+				.toString();
+
+		// Check if the intent action matches the dismiss action
+		if (getInputData().getString("action").equals(action)) {
 			handleActionDismiss();
 		}
 		Log.d(TAG, "ACTION_DISMISS(): " + ACTION_DISMISS);
@@ -67,13 +74,5 @@ public class BigPictureSocialIntentService extends Worker {
 		// Indicate success
 		return Result.success();
 	}
+
 }
-
-// Create a WorkRequest
-/*
-WorkRequest workRequest = new OneTimeWorkRequestBuilder<DismissNotificationWorker>()
-		.setInputData(workDataOf("action", ACTION_DISMISS))
-		.build();
-
-// Enqueue the WorkRequest
-WorkManager.getInstance(context).enqueue(workRequest);*/

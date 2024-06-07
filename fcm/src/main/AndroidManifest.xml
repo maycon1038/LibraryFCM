@@ -9,12 +9,25 @@
 
 	<application  android:allowBackup="true">
 
-		<service
+<!--		<service
 			android:name=".notifications.handlers.BigTextIntentService"
 			android:exported="false" />
+
 		<service
 			android:name=".notifications.handlers.BigPictureSocialIntentService"
-			android:exported="false" />
+			android:exported="false" />-->
+
+		<receiver
+			android:name=".notifications.DismissNotificationBroadCastReceiver"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<action android:name="android.intent.action.INPUT_METHOD_CHANGED" />
+			</intent-filter>
+		</receiver>
+
+
+		<!--MyBroadcastReceiver-->
 
 	</application>
 

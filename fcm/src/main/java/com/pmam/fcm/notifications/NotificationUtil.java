@@ -3,6 +3,9 @@ package com.pmam.fcm.notifications;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.media.AudioAttributes;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 
 public class NotificationUtil {
@@ -23,16 +26,25 @@ public class NotificationUtil {
 			int channelLockscreenVisibility = mockNotificationData.getChannelLockscreenVisibility();
 
 			// Initializes NotificationChannel.
-			NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW);
+			NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
 			notificationChannel.setDescription(channelDescription);
 			notificationChannel.enableVibration(channelEnableVibrate);
 			notificationChannel.setLockscreenVisibility(channelLockscreenVisibility);
 
+			Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+			AudioAttributes audioAttributes = new AudioAttributes.Builder()
+					.setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+					.setUsage(AudioAttributes.USAGE_NOTIFICATION)
+					.build();
+
+			notificationChannel.setSound(soundUri, audioAttributes);
+			notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400});
+
 			// Adds NotificationChannel to system. Attempting to create an existing notification
 			// channel with its original values performs no operation, so it's safe to perform the
 			// below sequence.
-			NotificationManager notificationManager =
-					(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.createNotificationChannel(notificationChannel);
 
 			return channelId;
