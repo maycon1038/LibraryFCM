@@ -8,9 +8,12 @@ import android.Manifest;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
+
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -38,13 +42,16 @@ import android.view.MenuItem;
 import android.widget.QuickContactBadge;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 	private static final String TAG = "MainActivity";
 
-
+    private static final int PERMISSION_REQUESTS = 113;
 
     // Você pode fazer a atribuição dentro de onAttach ou onCreate, ou seja, antes que a atividade seja exibida
     private final ActivityResultLauncher<String> mPermissionPotNotification = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
@@ -57,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         }
     });
 
+    @SuppressLint("SuspiciousIndentation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,33 +74,24 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
 		setProvider(this, "com.pmam.libraryfcm");
 
-		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		manager.cancel(NOTIFICATION_ID);
+	/*	NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		manager.cancel(NOTIFICATION_ID);*/
 		FirebaseMessaging.getInstance().getToken()
-				.addOnCompleteListener(new OnCompleteListener<String>() {
-					@Override
-					public void onComplete(@NonNull Task<String> task) {
-						if (!task.isSuccessful()) {
-							Log.w(TAG, "Falha ao buscar o token de registro do FCM", task.getException());
-							return;
-						}
+				.addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Falha ao buscar o token de registro do FCM", task.getException());
+                        return;
+                    }
 
-						// Get new FCM registration token
-						String token = task.getResult();
+                    // Get new FCM registration token
+                    String token = task.getResult();
 
-						// Log and toast
-						String msg = getString(R.string.msg_token_fmt, token);
-						Log.d(TAG, msg);
-						Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-					}
-				});
-		/*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			// Create channel to show notifications.
-			String channelId  = getString(R.string.default_notification_channel_id);
-			String channelName = getString(R.string.default_notification_channel_name);
-			NotificationManager notificationManager = getSystemService(NotificationManager.class);
-			notificationManager.createNotificationChannel(new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW));
-		}*/
+                    // Log and toast
+                    String msg = getString(R.string.msg_token_fmt, token);
+                    Log.d(TAG, msg);
+                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                });
+
 
 		if (getIntent().getExtras() != null) {
 			for (String key : getIntent().getExtras().keySet()) {
@@ -124,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
+        getRuntimePermissions();
 
 
     }
@@ -156,5 +155,45 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    private void getRuntimePermissions() {
+        List<String> allNeededPermissions = new ArrayList<>();
+        for (String permission : getRequiredPermissions()) {
+            //tg.LogD(new Throwable(), permission);
+            if (!isPermissionGranted(this, permission)) {
+                allNeededPermissions.add(permission);
+            }
+        }
+
+        if (!allNeededPermissions.isEmpty()) {
+            ActivityCompat.requestPermissions(this, allNeededPermissions.toArray(new String[0]), PERMISSION_REQUESTS);
+        }
+
+
+    }
+
+    private String[] getRequiredPermissions() {
+        try {
+            PackageInfo info = this.getPackageManager().getPackageInfo(this.getPackageName(), PackageManager.GET_PERMISSIONS);
+            String[] ps = info.requestedPermissions;
+            if (ps != null && ps.length > 0) {
+                return ps;
+            } else {
+                return new String[0];
+            }
+        } catch (Exception e) {
+            return new String[0];
+        }
+    }
+
+    private static boolean isPermissionGranted(Context context, String permission) {
+
+        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("MainActivity", "Permissão garantida: " + permission);
+            return true;
+        }
+        Log.d("MainActivity", "Permissão não concedida: " + permission);
+        return false;
     }
 }

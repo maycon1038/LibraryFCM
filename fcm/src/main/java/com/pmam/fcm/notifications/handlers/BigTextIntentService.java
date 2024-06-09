@@ -34,7 +34,7 @@ public class BigTextIntentService extends Worker {
 
 	/*public static final String ACTION_DISMISS = "br.com.pmam.copmam.notifications.handlers.action.DISMISS";*/
 	public static   String ARG_ACTION_DISMISS = "ARG_ACTION_DISMISS";
-	public static   String ACTION_DISMISS;
+	public static   String ACTION_DISMISS = "ACTION_DISMISS";
 	Context ctx;
 
 	public BigTextIntentService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -67,7 +67,7 @@ public class BigTextIntentService extends Worker {
 	/*	if (getInputData().getString("action").equals(action)) {
 			handleActionDismiss();
 		}*/
-		Log.d(TAG, "ACTION_DISMISS(): " + ACTION_DISMISS);
+		Log.d(TAG, "ACTION_DISMISS(): " + NOTIFICATION_ID);
 		Log.d(TAG, "provider(): " + provider);
 		// Indicate success
 		return Result.success();

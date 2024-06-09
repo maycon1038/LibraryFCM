@@ -27,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.TaskStackBuilder;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.work.Data;
@@ -118,38 +119,45 @@ public class FirstFragment extends Fragment {
         // 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
         String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, bigTextStyleReminderAppData);
 
-
-
         // 2. Build the BIG_TEXT_STYLE.
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
                 .bigText(bigTextStyleReminderAppData.getBigText())
                 .setBigContentTitle(bigTextStyleReminderAppData.getBigContentTitle())
                 .setSummaryText(bigTextStyleReminderAppData.getSummaryText());
 
+         // Defina a atividade para iniciar em uma tarefa nova e vazia.
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        //acção ao clicar na notificação
-        PendingIntent notifyPendingIntent = PendingIntent.getActivity(ctx, 0, notifyIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        // Crie o TaskStackBuilder e adicione a intenção, que aumenta a pilha de retorno.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(ctx);
+        stackBuilder.addNextIntentWithParentStack(notifyIntent);
+
+//Obtenha o PendingIntent que contém toda a backstack.
+        PendingIntent notifyPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
         //ação ao clicar no botao visualizar
-        PendingIntent snoozePendingIntent = PendingIntent.getActivity(ctx, 0, notifyIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Action snoozeAction = new NotificationCompat.Action.Builder(R.drawable.ic_eye, "Visualizar", snoozePendingIntent).build();
+/*        PendingIntent snoozePendingIntent = PendingIntent.getActivity(ctx, 0, notifyIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Action snoozeAction = new NotificationCompat.Action.Builder(R.drawable.ic_eye, "Visualizar", snoozePendingIntent).build();*/
+
+
+
+        //executar uma tarefa ao receber a notificação
+   /*     OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(BigTextIntentService.class)
+                .setInputData(new Data.Builder().putInt("action", NOTIFICATION_ID).build())
+                .build();
+        WorkManager.getInstance(ctx).enqueue(workRequest);*/
+
 
         // Dismiss Action - 1 opacao.
-        Intent dismissIntent = new Intent(ctx, DismissNotificationBroadCastReceiver.class);
+      /*  Intent dismissIntent = new Intent(ctx, DismissNotificationBroadCastReceiver.class);
         dismissIntent.putExtra(ARG_ACTION_DISMISS, NOTIFICATION_ID);
         dismissIntent.setAction(ACTION_DISMISS);
-
-        OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(BigTextIntentService.class)
-                .setInputData(new Data.Builder().putString("action", ACTION_DISMISS).build())
-                .build();
-        WorkManager.getInstance(ctx).enqueue(workRequest);
-
-
+           //ação ao clicar no botao fechar
         PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(ctx, 0, dismissIntent, PendingIntent.FLAG_MUTABLE);
-
-        NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();
+        NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();*/
 
 
         NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(ctx, notificationChannelId);
+
         GlobalNotificationBuilder.setNotificationCompatBuilderInstance(notificationCompatBuilder);
 
         @SuppressLint("WrongConstant") Notification notification = notificationCompatBuilder
@@ -159,23 +167,16 @@ public class FirstFragment extends Fragment {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentIntent(notifyPendingIntent)
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setColor(ContextCompat.getColor(ctx, com.msm.themes.R.color.primaryColorAmber))
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .setPriority(bigTextStyleReminderAppData.getPriority())
                 .setVisibility(bigTextStyleReminderAppData.getChannelLockscreenVisibility())
-                .addAction(snoozeAction)
-                .addAction(dismissAction)
+               // .addAction(snoozeAction)
+                .setAutoCancel(true)
+              //  .addAction(dismissAction)
                 .build();
 
         if (ActivityCompat.checkSelfPermission(ctx, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
 

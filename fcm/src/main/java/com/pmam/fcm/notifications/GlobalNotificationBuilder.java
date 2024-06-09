@@ -18,36 +18,36 @@ package com.pmam.fcm.notifications;
 import androidx.core.app.NotificationCompat;
 
 /**
- * We use a Singleton for a global copy of the NotificationCompat.Builder to update active
- * Notifications from other Services/Activities.
+ * Usamos um Singleton para uma cópia global do NotificationCompat.Builder para atualizar ativos
+ * Notificações de outros serviços/atividades.
  * <p>
- * You have two options for updating your notifications:
+ * Você tem duas opções para atualizar suas notificações:
  * <p>
- * 1. Use a new NotificationCompatBuilder to create the Notification. This approach requires you
- * to get *ALL* the information and pass it to the builder. We get all the information from a Mock
- * Database and this is the approach used in the MainActivity.
+ * 1. Use um novo NotificationCompatBuilder para criar a Notificação. Essa abordagem exige que você
+ * para obter *TODAS* as informações e passá-las ao construtor. Obtemos todas as informações de um Mock
+ * Banco de dados e esta é a abordagem usada na MainActivity.
  * <p>
- * 2. Use an existing NotificationCompatBuilder to create a Notification. This approach requires
- * you to store a reference to the original builder. The benefit is you only need the new/updated
- * information for an existing notification. We use this approach in the IntentService handlers to
- * update existing notifications.
+ * 2. Use um NotificationCompatBuilder existente para criar uma Notificação. Esta abordagem requer
+ * você armazena uma referência ao construtor original. A vantagem é que você só precisa do novo/atualizado
+ * informações para uma notificação existente. Usamos essa abordagem nos manipuladores IntentService para
+ * atualizar notificações existentes.
  * <p>
- * IMPORTANT NOTE 1: You shouldn't save/modify the resulting Notification object using
- * its member variables and/or legacy APIs. If you want to retain anything from update
- * to update, retain the Builder as option 2 outlines.
+ * IMPORTANT NOTE 1: Você não deve salvar/modificar o objeto Notification resultante usando
+ * suas variáveis de membro e/ou APIs legadas. Se você quiser reter alguma coisa da atualização
+ * para atualizar, mantenha o Builder conforme descrito na opção 2.
  * <p>
- * IMPORTANT NOTE 2: If the global Notification Builder is lost because the process is killed, you
- * should have a way to recreate the Notification Builder from a persistent state. (We do this as
- * well in the sample, check the IntentServices.)
+ * IMPORTANT NOTE 2: Se o Notification Builder global for perdido porque o processo foi encerrado, você
+ * deve ter uma maneira de recriar o Notification Builder a partir de um estado persistente. (Fazemos isso como
+ *bem na amostra, verifique o IntentServices.)
  */
 public final class GlobalNotificationBuilder {
 
-	public static final int NOTIFICATION_ID = 101;
+	public static int NOTIFICATION_ID = 113;
 	private static NotificationCompat.Builder sGlobalNotificationCompatBuilder = null;
 
 	/*
-	 * Empty constructor - We don't initialize builder because we rely on a null state to let us
-	 * know the Application's process was killed.
+	 * Empty constructor - Não inicializamos o construtor porque dependemos de um estado nulo para nos permitir
+	 *saber que o processo do aplicativo foi encerrado.
 	 */
 	private GlobalNotificationBuilder() {
 	}

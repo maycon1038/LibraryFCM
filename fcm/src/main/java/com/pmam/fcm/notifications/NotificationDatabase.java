@@ -255,11 +255,11 @@ public final class NotificationDatabase {
 
 		private static MessagingStyleCommsAppData sInstance = null;
 
-		// Unique data for this Notification.Style:
+		// Dados exclusivos para este Notification.Style:
 		private ArrayList<NotificationCompat.MessagingStyle.Message> mMessages;
-		// String of all mMessages.
+		// Sequência de todas as mensagens.
 		private String mFullConversation;
-		// Name preferred when replying to chat.
+		// Nome preferido ao responder ao chat.
 		private Person mMe;
 		private ArrayList<Person> mParticipants;
 
@@ -313,7 +313,7 @@ public final class NotificationDatabase {
 			// For each message, you need the timestamp. In this case, we are using arbitrary longs
 			// representing time in milliseconds.
 			mMessages.add(
-					// When you are setting an image for a message, text does not display.
+					// Ao definir uma imagem para uma mensagem, o texto não é exibido.
 					new NotificationCompat.MessagingStyle.Message("", 1528490641998l, participant1)
 							.setData("image/png", resourceToUri(context, R.drawable.earth)));
 
@@ -324,7 +324,7 @@ public final class NotificationDatabase {
 			mMessages.add(
 					new NotificationCompat.MessagingStyle.Message("Ei, eu vejo minha casa!", 1528490645998l, participant2));
 
-			// String version of the mMessages above.
+			// Versão string do mMessages acima.
 			mFullConversation =
 					"Famous: [Picture of Moon]\n\n"
 							+ "Me: Visitando a lua novamente? :P\n\n"
@@ -427,7 +427,7 @@ public final class NotificationDatabase {
 			mChannelName = nameChannel;
 			// The user-visible description of the channel.
 			mChannelDescription = "Notificações do " + nameChannel;
-			mChannelImportance = NotificationManager.IMPORTANCE_HIGH;
+			mChannelImportance =  NotificationManager.IMPORTANCE_HIGH;
 			mChannelEnableVibrate = true;
 			mChannelLockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC;
 		}
