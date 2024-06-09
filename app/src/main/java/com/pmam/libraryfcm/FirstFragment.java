@@ -118,6 +118,8 @@ public class FirstFragment extends Fragment {
          mNotificationManagerCompat = NotificationManagerCompat.from(ctx);
         // 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
         String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, bigTextStyleReminderAppData);
+        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(ctx, notificationChannelId);
+        GlobalNotificationBuilder.setNotificationCompatBuilderInstance(notificationCompatBuilder);
 
         // 2. Build the BIG_TEXT_STYLE.
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
@@ -156,24 +158,19 @@ public class FirstFragment extends Fragment {
         NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();*/
 
 
-        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(ctx, notificationChannelId);
 
-        GlobalNotificationBuilder.setNotificationCompatBuilderInstance(notificationCompatBuilder);
 
-        @SuppressLint("WrongConstant") Notification notification = notificationCompatBuilder
+      Notification notification = notificationCompatBuilder
                 .setStyle(bigTextStyle)
-                .setContentTitle(bigTextStyleReminderAppData.getContentTitle())
-                .setContentText(bigTextStyleReminderAppData.getContentText())
+               // .setContentTitle(bigTextStyleReminderAppData.getContentTitle())
+              //  .setContentText(bigTextStyleReminderAppData.getContentText())
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+               // .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentIntent(notifyPendingIntent)
-                .setColor(ContextCompat.getColor(ctx, com.msm.themes.R.color.primaryColorAmber))
                 .setCategory(Notification.CATEGORY_MESSAGE)
                 .setPriority(bigTextStyleReminderAppData.getPriority())
-                .setVisibility(bigTextStyleReminderAppData.getChannelLockscreenVisibility())
                // .addAction(snoozeAction)
                 .setAutoCancel(true)
-              //  .addAction(dismissAction)
                 .build();
 
         if (ActivityCompat.checkSelfPermission(ctx, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
