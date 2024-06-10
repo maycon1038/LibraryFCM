@@ -19,6 +19,8 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
@@ -73,7 +75,7 @@ public final class GlobalNotificationBuilder {
 
 //Obtenha o PendingIntent que contém toda a backstack.
 		PendingIntent notifyPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
+		Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		sGlobalNotificationCompatBuilder = builder;
 		sGlobalNotificationCompatBuilder
 				 .setContentTitle(title)
@@ -81,6 +83,7 @@ public final class GlobalNotificationBuilder {
 				.setContentIntent(notifyPendingIntent)
 				.setCategory(Notification.CATEGORY_MESSAGE)
 				.setPriority(NotificationCompat.PRIORITY_DEFAULT)
+	            .setSound(defaultSoundUri)
 				.setAutoCancel(true);
 	}
 	}
