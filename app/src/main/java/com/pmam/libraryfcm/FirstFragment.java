@@ -127,6 +127,7 @@ public class FirstFragment extends Fragment {
                 .setBigContentTitle(bigTextStyleReminderAppData.getBigContentTitle())
                 .setSummaryText(bigTextStyleReminderAppData.getSummaryText());
 
+
          // Defina a atividade para iniciar em uma tarefa nova e vazia.
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         // Crie o TaskStackBuilder e adicione a intenção, que aumenta a pilha de retorno.
@@ -164,6 +165,8 @@ public class FirstFragment extends Fragment {
                 .setStyle(bigTextStyle)
                // .setContentTitle(bigTextStyleReminderAppData.getContentTitle())
               //  .setContentText(bigTextStyleReminderAppData.getContentText())
+
+
                 .setSmallIcon(R.mipmap.ic_launcher)
                // .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentIntent(notifyPendingIntent)
