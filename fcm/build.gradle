@@ -12,7 +12,10 @@ android {
 
     ndkVersion '27.0.11718014 rc1'
 
-
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_22
+        targetCompatibility JavaVersion.VERSION_22
+    }
 }
 
 
