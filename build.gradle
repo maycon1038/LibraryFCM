@@ -1,3 +1,4 @@
+apply plugin: 'maven-publish'
 
 buildscript {
 	repositories {
@@ -19,6 +20,8 @@ allprojects {
 		google()
 		mavenCentral()
 		maven { url "https://jitpack.io" }
+		maven { url  "https://dl.bintray.com/blazei/maven" }
+		maven {  url "https://maven.google.com"  }
 	}
 }
 
