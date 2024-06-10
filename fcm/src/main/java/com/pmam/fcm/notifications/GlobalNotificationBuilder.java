@@ -84,6 +84,7 @@ public final class GlobalNotificationBuilder {
 				.setCategory(Notification.CATEGORY_MESSAGE)
 				.setPriority(NotificationCompat.PRIORITY_DEFAULT)
 	            .setSound(defaultSoundUri)
+				.setVibrate(new long[]{100, 200, 300, 400})
 				.setAutoCancel(true);
 	}
 	}
