@@ -23,12 +23,12 @@ public final class NotificationDatabase {
 		return BigTextStyleReminderAppData.getInstance(title, content, summary, ChannelId, nameChannel);
 	}
 
-	public static InboxStyleEmailAppData getInboxStyleData(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
-		return InboxStyleEmailAppData.getInstance(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
+	public static InboxStyleAppData getInboxStyleData(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
+		return InboxStyleAppData.getInstance(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
 	}
-	private static synchronized InboxStyleEmailAppData getSync(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
+	private static synchronized InboxStyleAppData getSync(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
 
-		return new InboxStyleEmailAppData(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
+		return new InboxStyleAppData(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
 
 	}
 
@@ -76,7 +76,6 @@ public final class NotificationDatabase {
 			mChannelEnableVibrate = true;
 			mChannelLockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC;
 			// Notification channel values (for devices targeting 26 and above):
-			mChannelId = "channel_social_1";
 		}
 
 		public static ProgressBarAppData getInstance(String title, String content, String summary, String channelId, String nameChannel) {
@@ -163,9 +162,9 @@ public final class NotificationDatabase {
 		}
 	}
 
-	public static class InboxStyleEmailAppData extends MockNotificationData {
+	public static class InboxStyleAppData extends MockNotificationData {
 
-		private static InboxStyleEmailAppData sInstance = null;
+		private static InboxStyleAppData sInstance = null;
 
 		// Unique data for this Notification.Style:
 		private int mNumberOfNewEmails;
@@ -177,7 +176,7 @@ public final class NotificationDatabase {
 
 		private ArrayList<String> mParticipants;
 
-		private InboxStyleEmailAppData(String mContentTitle,ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
+		private InboxStyleAppData(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
 			mContentText = (listMsm.size() > 1) ? listMsm.get(0) + ", + " + (listMsm.size() - 1) : listMsm.get(0);
 			mNumberOfNewEmails = listMsm.size();
 			mPriority = NotificationCompat.PRIORITY_DEFAULT;
@@ -185,7 +184,7 @@ public final class NotificationDatabase {
 			mSummaryText = mContentTitle;
 			this.mParticipants = mParticipants;
 			this.mIndividualEmailSummary = listMsm;
-			this.mChannelId = mChannelId;
+			this.mChannelId = "channel_social_1"  + mChannelId;
 			this.mChannelName = mChannelName;
 			mChannelDescription = "Notificações do " + mChannelName;
 			mChannelImportance = NotificationManager.IMPORTANCE_HIGH;
@@ -193,15 +192,15 @@ public final class NotificationDatabase {
 			mChannelLockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC;
 		}
 
-		public static InboxStyleEmailAppData getInstance(String mContentTitle,ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
+		public static InboxStyleAppData getInstance(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
 
 			return getSync(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
 
 		}
 
-		private static synchronized InboxStyleEmailAppData getSync(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
+		private static synchronized InboxStyleAppData getSync(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
 
-			return new InboxStyleEmailAppData(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
+			return new InboxStyleAppData(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
 
 		}
 
@@ -310,6 +309,10 @@ public final class NotificationDatabase {
 			mMessages.add(
 					new NotificationCompat.MessagingStyle.Message("Ei, eu vejo minha casa!", 1528490645998l, participant2));
 
+
+			mMessages.add(
+					new NotificationCompat.MessagingStyle.Message("Ei, eu não vejo a minha casa!", 1528490645998l, participant2));
+
 			// Versão string do mMessages acima.
 			mFullConversation =
 					"Famous: [Picture of Moon]\n\n"
@@ -327,7 +330,7 @@ public final class NotificationDatabase {
 			mChannelName = "Mensagens";
 			// The user-visible description of the channel.
 			mChannelDescription = "Notificações de mensagens do " + mAppName;
-			mChannelImportance = NotificationManager.IMPORTANCE_MAX;
+			mChannelImportance = NotificationManager.IMPORTANCE_HIGH;
 			mChannelEnableVibrate = true;
 			mChannelLockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC;
 		}

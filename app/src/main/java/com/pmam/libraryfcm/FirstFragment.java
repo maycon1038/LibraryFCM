@@ -2,6 +2,7 @@ package com.pmam.libraryfcm;
 
 import static com.msm.themes.util.themePreferencia.getProvider;
 import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
+import static com.pmam.fcm.notifications.NotificationDatabase.getInboxStyleData;
 import static com.pmam.fcm.notifications.handlers.BigTextIntentService.ACTION_DISMISS;
 import static com.pmam.fcm.notifications.handlers.BigTextIntentService.ARG_ACTION_DISMISS;
 
@@ -31,20 +32,19 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.app.TaskStackBuilder;
+import androidx.core.app.Person;
 import androidx.fragment.app.Fragment;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import com.google.firebase.Timestamp;
 import com.pmam.fcm.notifications.DismissNotificationBroadCastReceiver;
 import com.pmam.fcm.notifications.GlobalNotificationBuilder;
 import com.pmam.fcm.notifications.NotificationDatabase;
 import com.pmam.fcm.notifications.NotificationUtil;
-import com.pmam.fcm.notifications.handlers.BigTextIntentService;
 import com.pmam.libraryfcm.databinding.FragmentFirstBinding;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -54,6 +54,8 @@ public class FirstFragment extends Fragment {
     private static final String TAG = "FirstFragment";
     private Context ctx;
     private WorkManager mWorkManager;
+
+    public static java.util.ArrayList<mEvento> listEventos;
 
     private static final String NOTIFICATION_CHANNEL_ID = "101";
     private static final String NOTIFICATION_CHANNEL = "teste";
@@ -132,7 +134,70 @@ public class FirstFragment extends Fragment {
             }
         });
 
-        //button2
+        binding.button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                  redeSocial();
+            }
+        });
+
+    }
+
+    private void redeSocial() {
+
+        Log.d(TAG, "A tarefa de curta duração é feita.");
+        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        final SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("pt", "BR"));
+        Intent notifyIntent = new Intent(getContext(), MainActivity2.class);
+        mEvento me = new mEvento();
+        me.setDateTimeEvento(new Timestamp(new Date()));
+        me.setIdDoc("idDoc" + (int) System.currentTimeMillis());
+        me.setNomeEvento("Evento de Teste: " + (int) System.currentTimeMillis());
+        //	myIntent.putExtra("idDocEvento", me.getIdDoc());
+
+     if(listEventos == null){
+         listEventos = new java.util.ArrayList<>();
+         listEventos.add(me);
+     }else {
+         listEventos.add(me);
+     }
+        ArrayList<String> ListTitle = new ArrayList<>();
+        ArrayList<String> ListContentText = new ArrayList<>();
+
+        for (mEvento evento : listEventos){
+            String titulo = "Novo Evento disponível";
+            ListTitle.add(titulo);
+            ListContentText.add(evento.getNomeEvento() + " - " + sdf.format(evento.getDateTimeEvento().toDate()));
+        }
+
+
+        NotificationDatabase.InboxStyleAppData inboxStyle = getInboxStyleData("SEG - Evento", ListTitle, ListContentText, NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL);
+        generateInboxStyleNotification(notifyIntent, inboxStyle);
+    }
+
+    private void generateSocialStyleNotification(Intent notifyIntent, NotificationDatabase.MessagingStyleCommsAppData ntdata) {
+
+        mNotificationManagerCompat = NotificationManagerCompat.from(ctx);
+        // 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
+        String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, ntdata);
+
+
+
+        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(ctx, notificationChannelId);
+
+        GlobalNotificationBuilder.setNotificationCompatBuilderInstance(ctx, notificationCompatBuilder, ntdata.getContentTitle(), ntdata.getContentText(), notifyIntent);
+        notificationCompatBuilder.setSmallIcon(R.mipmap.ic_launcher);
+
+        for (NotificationCompat.MessagingStyle.Message m: ntdata.getMessages()) {
+            assert m.getPerson() != null;
+            notificationCompatBuilder.setStyle(new NotificationCompat.MessagingStyle(m.getPerson())
+                    .addMessage(m));
+        }
+
+        Notification notification =  notificationCompatBuilder.build();
+        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            mNotificationManagerCompat.notify(113, notification);
+        }
     }
 
     @Override
@@ -220,6 +285,38 @@ public class FirstFragment extends Fragment {
             mNotificationManagerCompat.notify(111, notification);
         }
 
+    }
+
+
+    private void generateInboxStyleNotification(Intent notifyIntent, NotificationDatabase.InboxStyleAppData ntdata) {
+        mNotificationManagerCompat = NotificationManagerCompat.from(ctx);
+        // 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
+        String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, ntdata);
+        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(ctx, notificationChannelId);
+        // 2. Build the INBOX_STYLE.
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle()
+                .setBigContentTitle(ntdata.getBigContentTitle())
+                .setSummaryText(ntdata.getSummaryText());
+
+        // Add each summary line of the new emails, you can add up to 5.
+        for (String summary : ntdata.getIndividualEmailSummary()) {
+            inboxStyle.addLine(summary);
+        }
+
+        for (String name : ntdata.getParticipants()) {
+            final Person person = new Person.Builder().setUri(name).build();
+            notificationCompatBuilder.addPerson(person);
+        }
+
+        GlobalNotificationBuilder.setNotificationCompatBuilderInstance(ctx, notificationCompatBuilder, ntdata.getBigContentTitle(), ntdata.getContentText(), notifyIntent);
+        Notification notification = notificationCompatBuilder
+                .setStyle(inboxStyle)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .build();
+
+        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            mNotificationManagerCompat.notify(111, notification);
+        }
     }
 
     private void sendNotification(String messageBody) {
