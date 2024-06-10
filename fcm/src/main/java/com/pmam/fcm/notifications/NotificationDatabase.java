@@ -113,35 +113,21 @@ public final class NotificationDatabase {
 		private BigPictureStyleSocialAppData(Bitmap imgBig, String title, String content, String summary, String channelId, String nameChannel) {
 			// Standard Notification values:
 			// Title/Content for API <16 (4.0 and below) devices.
-
-
-			// Standard Notification values:
 			// Title for API <16 (4.0 and below) devices.
 			mContentTitle = title;
 			// Content for API <24 (4.0 and below) devices.
 			mContentText = content;
 			mPriority = NotificationCompat.PRIORITY_DEFAULT;
-
-			// BigText Style Notification values:
 			mBigContentTitle = title;
 			mSummaryText = summary;
-
-//			// Notification channel values (for devices targeting 26 and above):
-//			mChannelId = "channel_reminder_" + channelId;
-//			// The user-visible name of the channel.
-//			mChannelName = nameChannel;
-//			// The user-visible description of the channel.
-//			mChannelDescription = "Notificações do " + nameChannel;
-//			mChannelImportance = NotificationManager.IMPORTANCE_HIGH;
-//			mChannelEnableVibrate = false;
-//			mChannelLockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC;
-
+			mChannelName = nameChannel;
 			// Style notification values:
 			mBigImage = imgBig;
 			// Notification channel values (for devices targeting 26 and above):
-			mChannelId = "channel_social_1";
+			mChannelId = "channel_picture_"  + channelId;
 			// The user-visible name of the channel.
 			// The user-visible description of the channel.
+			mChannelDescription = "Notificações do " + nameChannel;
 			mChannelImportance = NotificationManager.IMPORTANCE_HIGH;
 			mChannelEnableVibrate = true;
 			mChannelLockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC;

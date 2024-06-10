@@ -1,12 +1,17 @@
 package com.pmam.libraryfcm;
 
+import static java.sql.DriverManager.println;
+
 import android.app.NotificationChannel;
+import android.app.PendingIntent;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 
@@ -18,6 +23,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.pmam.libraryfcm.databinding.ActivityMain2Binding;
+
+import java.lang.reflect.Field;
 
 public class MainActivity2 extends AppCompatActivity {
 
@@ -33,8 +40,6 @@ public class MainActivity2 extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
 
 
-
-       // Log.e("MainActivity2", "title: " +  title  + "text: " +  text );
 
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main2);

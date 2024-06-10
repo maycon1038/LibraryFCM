@@ -1,11 +1,10 @@
 package com.pmam.libraryfcm;
 
+import static com.msm.themes.util.themePreferencia.getProvider;
 import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
-import static com.pmam.fcm.notifications.DismissNotificationBroadCastReceiver.ARG_ACTION_DISMISS;
-import static com.pmam.fcm.notifications.handlers.BigTextIntentService.ACTION_DISMISS;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,7 +12,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -22,23 +21,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import com.pmam.fcm.notifications.GlobalNotificationBuilder;
-import com.pmam.fcm.notifications.DismissNotificationBroadCastReceiver;
 import com.pmam.fcm.notifications.NotificationDatabase;
 import com.pmam.fcm.notifications.NotificationUtil;
-import com.pmam.fcm.notifications.handlers.BigTextIntentService;
 import com.pmam.libraryfcm.databinding.FragmentFirstBinding;
 
 import java.text.SimpleDateFormat;
@@ -56,6 +53,27 @@ public class FirstFragment extends Fragment {
     private static final String NOTIFICATION_CHANNEL = "teste";
 
     private NotificationManagerCompat mNotificationManagerCompat;
+    private Bitmap bitmapImg;
+    // Você pode fazer a atribuição dentro de onAttach ou onCreate, ou seja, antes que a atividade seja exibida
+    ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            // There are no request codes
+            Intent data = result.getData();
+            bitmapImg = ImagePicker.getImageFromResult(ctx, result.getResultCode(), data);
+            BigImagem("Imagem", "Notificação de Imagem", bitmapImg);
+
+        }
+    });
+    private final ActivityResultLauncher<String> mPermissionCameraPermission = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
+        if (result) {
+            Intent intent = ImagePicker.getPickImageIntent(ctx, getProvider(ctx));
+            someActivityResultLauncher.launch(intent);
+        } else {
+            Toast.makeText(ctx, "Permissão negada!", Toast.LENGTH_SHORT).show();
+            //tg.LogD("onActivityResult: PERMISSION DENIED");
+        }
+    });
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,6 +114,19 @@ public class FirstFragment extends Fragment {
                     BigText("BigText", "O tamanho máximo do texto é de 256 caracteres");
             }
         });
+
+        binding.button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ///
+                    /*O estilo de texto grande é suportado a partir da API de nível 16.
+                    O tamanho máximo do texto é de 256 caracteres.
+                    A cor de fundo é opcional. Se não for definida, a cor de fundo padrão será usada.*/
+                selectImage();
+            }
+        });
+
+        //button2
     }
 
     @Override
@@ -114,134 +145,75 @@ public class FirstFragment extends Fragment {
 
     }
 
-    private void generateBigTextStyleNotification(Intent notifyIntent, NotificationDatabase.BigTextStyleReminderAppData bigTextStyleReminderAppData) {
-         mNotificationManagerCompat = NotificationManagerCompat.from(ctx);
-        // 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
-        String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, bigTextStyleReminderAppData);
-        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(ctx, notificationChannelId);
-        GlobalNotificationBuilder.setNotificationCompatBuilderInstance(notificationCompatBuilder);
+    public void selectImage() {
+        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            Intent intent = ImagePicker.getPickImageIntent(ctx,  getProvider(ctx));
+            someActivityResultLauncher.launch(intent);
 
-        // 2. Build the BIG_TEXT_STYLE.
-        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
-                .bigText(bigTextStyleReminderAppData.getBigText())
-                .setBigContentTitle(bigTextStyleReminderAppData.getBigContentTitle())
-                .setSummaryText(bigTextStyleReminderAppData.getSummaryText());
-
-
-         // Defina a atividade para iniciar em uma tarefa nova e vazia.
-        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        // Crie o TaskStackBuilder e adicione a intenção, que aumenta a pilha de retorno.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(ctx);
-        stackBuilder.addNextIntentWithParentStack(notifyIntent);
-
-//Obtenha o PendingIntent que contém toda a backstack.
-        PendingIntent notifyPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        //ação ao clicar no botao visualizar
-/*        PendingIntent snoozePendingIntent = PendingIntent.getActivity(ctx, 0, notifyIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Action snoozeAction = new NotificationCompat.Action.Builder(R.drawable.ic_eye, "Visualizar", snoozePendingIntent).build();*/
-
-
-
-        //executar uma tarefa ao receber a notificação
-   /*     OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(BigTextIntentService.class)
-                .setInputData(new Data.Builder().putInt("action", NOTIFICATION_ID).build())
-                .build();
-        WorkManager.getInstance(ctx).enqueue(workRequest);*/
-
-
-        // Dismiss Action - 1 opacao.
-      /*  Intent dismissIntent = new Intent(ctx, DismissNotificationBroadCastReceiver.class);
-        dismissIntent.putExtra(ARG_ACTION_DISMISS, NOTIFICATION_ID);
-        dismissIntent.setAction(ACTION_DISMISS);
-           //ação ao clicar no botao fechar
-        PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(ctx, 0, dismissIntent, PendingIntent.FLAG_MUTABLE);
-        NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();*/
-
-
-
-
-      Notification notification = notificationCompatBuilder
-                .setStyle(bigTextStyle)
-               // .setContentTitle(bigTextStyleReminderAppData.getContentTitle())
-              //  .setContentText(bigTextStyleReminderAppData.getContentText())
-
-
-                .setSmallIcon(R.mipmap.ic_launcher)
-               // .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
-                .setContentIntent(notifyPendingIntent)
-                .setCategory(Notification.CATEGORY_MESSAGE)
-                .setPriority(bigTextStyleReminderAppData.getPriority())
-               // .addAction(snoozeAction)
-                .setAutoCancel(true)
-                .build();
-
-        if (ActivityCompat.checkSelfPermission(ctx, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            return;
+        } else {
+            mPermissionCameraPermission.launch(Manifest.permission.CAMERA);
         }
-
-        mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
     }
 
 
-    private void generateBigImageStyleNotification(Intent notifyIntent, NotificationDatabase.BigPictureStyleSocialAppData bigPictureStyleReminderAppData) {
-        mNotificationManagerCompat = NotificationManagerCompat.from(ctx);
+    private void BigImagem(String title, String msm, Bitmap img) {
+        Log.d(TAG, "A tarefa de curta duração é feita.");
+        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        final SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("pt", "BR"));
+        Intent notifyIntent = new Intent(getContext(), MainActivity2.class);
+        NotificationDatabase.BigPictureStyleSocialAppData bigTextStyleReminderAppData = NotificationDatabase.getBigPictureStyleData(img, title, msm, sdf.format(new Date()), NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL);
+        generateBigImageStyleNotification(notifyIntent, bigTextStyleReminderAppData);
+
+    }
+
+    private void generateBigTextStyleNotification(Intent notifyIntent, NotificationDatabase.BigTextStyleReminderAppData ntdata) {
+         mNotificationManagerCompat = NotificationManagerCompat.from(ctx);
         // 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
-        String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, bigPictureStyleReminderAppData);
-
-        // 1. Build the BIG_PICTURE_STYLE
-        NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle()
-                .bigPicture(bigPictureStyleReminderAppData.getmBigImage())
-                .setBigContentTitle(bigPictureStyleReminderAppData.getBigContentTitle())
-                .setSummaryText(bigPictureStyleReminderAppData.getSummaryText());
-
-        // 2. Set up main Intent for notification
-
-        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        //acção ao clicar na notificação
-        PendingIntent notifyPendingIntent = PendingIntent.getActivity(ctx, 0, notifyIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        //ação ao clicar no botao visualizar
-        PendingIntent snoozePendingIntent = PendingIntent.getActivity(ctx, 0, notifyIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Action snoozeAction = new NotificationCompat.Action.Builder(R.drawable.ic_eye, "Visualizar", snoozePendingIntent).build();
-
-        // Dismiss Action - 1 opacao.
-        Intent dismissIntent = new Intent(ctx, BigTextIntentService.class);
-        dismissIntent.setAction(ACTION_DISMISS);
-
-        PendingIntent dismissPendingIntent = PendingIntent.getService(ctx, 0, dismissIntent,PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, ntdata);
 
 
-        NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();
+        // 2. Build the BIG_TEXT_STYLE.
+        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
+                .bigText(ntdata.getBigText())
+                .setBigContentTitle(ntdata.getBigContentTitle())
+                .setSummaryText(ntdata.getSummaryText());
 
         NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(ctx, notificationChannelId);
 
-        GlobalNotificationBuilder.setNotificationCompatBuilderInstance(notificationCompatBuilder);
-
-        @SuppressLint("WrongConstant") Notification notification = notificationCompatBuilder
-                .setStyle(bigPictureStyle)
-                .setContentTitle(bigPictureStyleReminderAppData.getContentTitle())
-                .setContentText(bigPictureStyleReminderAppData.getContentText())
+        GlobalNotificationBuilder.setNotificationCompatBuilderInstance(ctx, notificationCompatBuilder, ntdata.getBigContentTitle(), ntdata.getContentText(), notifyIntent);
+        Notification notification = notificationCompatBuilder
+                .setStyle(bigTextStyle)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
-                .setContentIntent(notifyPendingIntent)
-                .setColor(getResources().getColor(com.msm.themes.R.color.primaryColorAmber))
-                .addAction(dismissAction)
-                .addAction(snoozeAction)
-                .setCategory(Notification.CATEGORY_SOCIAL)
-                .setPriority(bigPictureStyleReminderAppData.getPriority())
-                .setVisibility(bigPictureStyleReminderAppData.getChannelLockscreenVisibility()).build();
+                .build();
 
-        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
         }
-        mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
+    }
+
+
+    private void generateBigImageStyleNotification(Intent notifyIntent, NotificationDatabase.BigPictureStyleSocialAppData ntdata) {
+        mNotificationManagerCompat = NotificationManagerCompat.from(ctx);
+        // 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
+        String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, ntdata);
+
+        // 1. Build the BIG_PICTURE_STYLE
+        NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle()
+                .bigPicture(ntdata.getmBigImage())
+                .setBigContentTitle(ntdata.getBigContentTitle())
+                .setSummaryText(ntdata.getSummaryText());
+
+         NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(ctx, notificationChannelId);
+         GlobalNotificationBuilder.setNotificationCompatBuilderInstance(ctx, notificationCompatBuilder, ntdata.getBigContentTitle(), ntdata.getContentText(), notifyIntent);
+        Notification notification = notificationCompatBuilder
+                .setStyle(bigPictureStyle)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .build();
+
+        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
+        }
+
     }
 
     private void sendNotification(String messageBody) {

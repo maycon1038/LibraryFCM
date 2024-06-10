@@ -15,7 +15,13 @@ limitations under the License.
  */
 package com.pmam.fcm.notifications;
 
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.TaskStackBuilder;
 
 /**
  * Usamos um Singleton para uma cópia global do NotificationCompat.Builder para atualizar ativos
@@ -59,4 +65,24 @@ public final class GlobalNotificationBuilder {
 	public static void setNotificationCompatBuilderInstance(NotificationCompat.Builder builder) {
 		sGlobalNotificationCompatBuilder = builder;
 	}
-}
+
+	public static void setNotificationCompatBuilderInstance(Context ctx, NotificationCompat.Builder builder, String title, String content, Intent notifyIntent) {
+
+		TaskStackBuilder stackBuilder = TaskStackBuilder.create(ctx);
+		stackBuilder.addNextIntentWithParentStack(notifyIntent);
+
+//Obtenha o PendingIntent que contém toda a backstack.
+		PendingIntent notifyPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+		sGlobalNotificationCompatBuilder = builder;
+		sGlobalNotificationCompatBuilder
+				 .setContentTitle(title)
+				 .setContentText(content)
+				.setContentIntent(notifyPendingIntent)
+				.setCategory(Notification.CATEGORY_MESSAGE)
+				.setPriority(NotificationCompat.PRIORITY_DEFAULT)
+				.setAutoCancel(true);
+	}
+	}
+
+
