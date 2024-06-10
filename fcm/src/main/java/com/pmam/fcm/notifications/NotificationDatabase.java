@@ -23,12 +23,12 @@ public final class NotificationDatabase {
 		return BigTextStyleReminderAppData.getInstance(title, content, summary, ChannelId, nameChannel);
 	}
 
-	public static InboxStyleAppData getInboxStyleData(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
-		return InboxStyleAppData.getInstance(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
+	public static InboxStyleEmailAppData getInboxStyleData(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
+		return InboxStyleEmailAppData.getInstance(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
 	}
-	private static synchronized InboxStyleAppData getSync(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
+	private static synchronized InboxStyleEmailAppData getSync(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
 
-		return new InboxStyleAppData(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
+		return new InboxStyleEmailAppData(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
 
 	}
 
@@ -162,9 +162,9 @@ public final class NotificationDatabase {
 		}
 	}
 
-	public static class InboxStyleAppData extends MockNotificationData {
+	public static class InboxStyleEmailAppData extends MockNotificationData {
 
-		private static InboxStyleAppData sInstance = null;
+		private static InboxStyleEmailAppData sInstance = null;
 
 		// Unique data for this Notification.Style:
 		private int mNumberOfNewEmails;
@@ -176,7 +176,7 @@ public final class NotificationDatabase {
 
 		private ArrayList<String> mParticipants;
 
-		private InboxStyleAppData(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
+		private InboxStyleEmailAppData(String mContentTitle,ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
 			mContentText = (listMsm.size() > 1) ? listMsm.get(0) + ", + " + (listMsm.size() - 1) : listMsm.get(0);
 			mNumberOfNewEmails = listMsm.size();
 			mPriority = NotificationCompat.PRIORITY_DEFAULT;
@@ -192,15 +192,15 @@ public final class NotificationDatabase {
 			mChannelLockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC;
 		}
 
-		public static InboxStyleAppData getInstance(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
+		public static InboxStyleEmailAppData getInstance(String mContentTitle,ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
 
 			return getSync(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
 
 		}
 
-		private static synchronized InboxStyleAppData getSync(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
+		private static synchronized InboxStyleEmailAppData getSync(String mContentTitle, ArrayList<String> mParticipants, ArrayList<String> listMsm, String mChannelId, String mChannelName) {
 
-			return new InboxStyleAppData(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
+			return new InboxStyleEmailAppData(mContentTitle, mParticipants, listMsm,   mChannelId,   mChannelName);
 
 		}
 

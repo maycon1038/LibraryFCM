@@ -171,34 +171,10 @@ public class FirstFragment extends Fragment {
         }
 
 
-        NotificationDatabase.InboxStyleAppData inboxStyle = getInboxStyleData("SEG - Evento", ListTitle, ListContentText, NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL);
+        NotificationDatabase.InboxStyleEmailAppData inboxStyle = getInboxStyleData("SEG - Evento", ListTitle, ListContentText, NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL);
         generateInboxStyleNotification(notifyIntent, inboxStyle);
     }
 
-    private void generateSocialStyleNotification(Intent notifyIntent, NotificationDatabase.MessagingStyleCommsAppData ntdata) {
-
-        mNotificationManagerCompat = NotificationManagerCompat.from(ctx);
-        // 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
-        String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, ntdata);
-
-
-
-        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(ctx, notificationChannelId);
-
-        GlobalNotificationBuilder.setNotificationCompatBuilderInstance(ctx, notificationCompatBuilder, ntdata.getContentTitle(), ntdata.getContentText(), notifyIntent);
-        notificationCompatBuilder.setSmallIcon(R.mipmap.ic_launcher);
-
-        for (NotificationCompat.MessagingStyle.Message m: ntdata.getMessages()) {
-            assert m.getPerson() != null;
-            notificationCompatBuilder.setStyle(new NotificationCompat.MessagingStyle(m.getPerson())
-                    .addMessage(m));
-        }
-
-        Notification notification =  notificationCompatBuilder.build();
-        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            mNotificationManagerCompat.notify(113, notification);
-        }
-    }
 
     @Override
     public void onDestroyView() {
@@ -288,7 +264,7 @@ public class FirstFragment extends Fragment {
     }
 
 
-    private void generateInboxStyleNotification(Intent notifyIntent, NotificationDatabase.InboxStyleAppData ntdata) {
+    private void generateInboxStyleNotification(Intent notifyIntent, NotificationDatabase.InboxStyleEmailAppData ntdata) {
         mNotificationManagerCompat = NotificationManagerCompat.from(ctx);
         // 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
         String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, ntdata);
@@ -332,7 +308,7 @@ public class FirstFragment extends Fragment {
         dismissIntent.setAction(ACTION_DISMISS);
         dismissIntent.putExtra(ARG_ACTION_DISMISS, NOTIFICATION_ID);
         //ação ao clicar no botao fechar
-        PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(ctx, 0, dismissIntent, PendingIntent.FLAG_MUTABLE);
+        PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(ctx, 0, dismissIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();
 
         String channelId = getString(R.string.default_notification_channel_id);
@@ -360,6 +336,30 @@ public class FirstFragment extends Fragment {
         }
 
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+    }
+    private void generateSocialStyleNotification(Intent notifyIntent, NotificationDatabase.MessagingStyleCommsAppData ntdata) {
+
+        mNotificationManagerCompat = NotificationManagerCompat.from(ctx);
+        // 1. Create/Retrieve Notification Channel for O and beyond devices (26+).
+        String notificationChannelId = NotificationUtil.createNotificationChannel(ctx, ntdata);
+
+
+
+        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(ctx, notificationChannelId);
+
+        GlobalNotificationBuilder.setNotificationCompatBuilderInstance(ctx, notificationCompatBuilder, ntdata.getContentTitle(), ntdata.getContentText(), notifyIntent);
+        notificationCompatBuilder.setSmallIcon(R.mipmap.ic_launcher);
+
+        for (NotificationCompat.MessagingStyle.Message m: ntdata.getMessages()) {
+            assert m.getPerson() != null;
+            notificationCompatBuilder.setStyle(new NotificationCompat.MessagingStyle(m.getPerson())
+                    .addMessage(m));
+        }
+
+        Notification notification =  notificationCompatBuilder.build();
+        if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            mNotificationManagerCompat.notify(113, notification);
+        }
     }
 
 }

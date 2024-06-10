@@ -2,6 +2,8 @@ package com.pmam.fcm.notifications;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
+import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
+
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,6 +23,7 @@ public class DismissNotificationBroadCastReceiver extends BroadcastReceiver {
 		Log.d(TAG, log);
 		NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
 		manager.cancel(intent.getIntExtra(ARG_ACTION_DISMISS, -1));
+		manager.cancel(NOTIFICATION_ID);
 
 
 	}

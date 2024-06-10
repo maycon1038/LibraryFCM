@@ -74,7 +74,7 @@ public final class GlobalNotificationBuilder {
 		stackBuilder.addNextIntentWithParentStack(notifyIntent);
 
 //Obtenha o PendingIntent que contém toda a backstack.
-		PendingIntent notifyPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+		PendingIntent notifyPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 		Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		sGlobalNotificationCompatBuilder = builder;
 		sGlobalNotificationCompatBuilder
