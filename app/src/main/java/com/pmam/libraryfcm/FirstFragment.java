@@ -2,6 +2,8 @@ package com.pmam.libraryfcm;
 
 import static com.msm.themes.util.themePreferencia.getProvider;
 import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
+import static com.pmam.fcm.notifications.handlers.BigTextIntentService.ACTION_DISMISS;
+import static com.pmam.fcm.notifications.handlers.BigTextIntentService.ARG_ACTION_DISMISS;
 
 import android.Manifest;
 import android.app.Activity;
@@ -31,11 +33,15 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
 import androidx.fragment.app.Fragment;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import com.pmam.fcm.notifications.DismissNotificationBroadCastReceiver;
 import com.pmam.fcm.notifications.GlobalNotificationBuilder;
 import com.pmam.fcm.notifications.NotificationDatabase;
 import com.pmam.fcm.notifications.NotificationUtil;
+import com.pmam.fcm.notifications.handlers.BigTextIntentService;
 import com.pmam.libraryfcm.databinding.FragmentFirstBinding;
 
 import java.text.SimpleDateFormat;
@@ -187,7 +193,7 @@ public class FirstFragment extends Fragment {
                 .build();
 
         if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
+            mNotificationManagerCompat.notify(110, notification);
         }
     }
 
@@ -211,16 +217,26 @@ public class FirstFragment extends Fragment {
                 .build();
 
         if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
+            mNotificationManagerCompat.notify(111, notification);
         }
 
     }
 
     private void sendNotification(String messageBody) {
-        Intent intent = new Intent(getContext(), MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0 /* Request code */, intent,
-                PendingIntent.FLAG_IMMUTABLE);
+        Intent notifyIntent = new Intent(getContext(), MainActivity2.class);
+        notifyIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //ação ao clicar no botao visualizar
+        PendingIntent snoozePendingIntent = PendingIntent.getActivity(ctx, 0, notifyIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Action snoozeAction = new NotificationCompat.Action.Builder(R.drawable.ic_eye, "Visualizar", snoozePendingIntent).build();
+
+
+        // Dismiss Action - 1 opacao.
+        Intent dismissIntent = new Intent(ctx, DismissNotificationBroadCastReceiver.class);
+        dismissIntent.setAction(ACTION_DISMISS);
+        dismissIntent.putExtra(ARG_ACTION_DISMISS, NOTIFICATION_ID);
+        //ação ao clicar no botao fechar
+        PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(ctx, 0, dismissIntent, PendingIntent.FLAG_MUTABLE);
+        NotificationCompat.Action dismissAction = new NotificationCompat.Action.Builder(R.drawable.ic_baseline_cancel_24, "Fechar", dismissPendingIntent).build();
 
         String channelId = getString(R.string.default_notification_channel_id);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -230,9 +246,11 @@ public class FirstFragment extends Fragment {
                         .setContentTitle(getString(R.string.fcm_message))
                         .setContentText(messageBody)
                         .setAutoCancel(true)
+                        .addAction(dismissAction)
+                         .addAction(snoozeAction)
                         .setSound(defaultSoundUri)
                         .setVibrate(new long[]{100, 200, 300, 400})
-                        .setContentIntent(pendingIntent);
+                        .setContentIntent(snoozePendingIntent);
 
         NotificationManager notificationManager = (NotificationManager) requireContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -244,7 +262,7 @@ public class FirstFragment extends Fragment {
             notificationManager.createNotificationChannel(channel);
         }
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
 }
