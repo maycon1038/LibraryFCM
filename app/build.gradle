@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
-//apply plugin: 'org.jetbrains.kotlin.android' version '1.8.0' apply false
 android {
     compileSdk 34
     namespace 'com.pmam.libraryfcm'
@@ -30,11 +29,7 @@ android {
     }
 
 
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(18))
-        }
-    }
+
 }
 
 
