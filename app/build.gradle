@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 android {
-    compileSdk 33
+    compileSdk 34
     namespace 'com.pmam.libraryfcm'
     defaultConfig {
         applicationId "com.pmam.libraryfcm"
         minSdkVersion 23  //determina em quais dispositivos o aplicativo pode ser instalado
-        targetSdkVersion 33  //ativa o aplicativo para um novo comportamento de tempo de execução
+        targetSdkVersion 34  //ativa o aplicativo para um novo comportamento de tempo de execução
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
