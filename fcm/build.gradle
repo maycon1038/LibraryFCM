@@ -16,6 +16,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_18
         targetCompatibility JavaVersion.VERSION_18
     }
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(18))
+        }
+    }
 }
 
 

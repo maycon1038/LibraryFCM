@@ -30,9 +30,11 @@ android {
     }
 
 
-    ndkVersion '27.0.11718014 rc1'
-
-
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(18))
+        }
+    }
 }
 
 
