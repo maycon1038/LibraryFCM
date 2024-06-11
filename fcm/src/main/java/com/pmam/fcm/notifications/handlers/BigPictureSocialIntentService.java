@@ -15,7 +15,6 @@ limitations under the License.
  */
 package com.pmam.fcm.notifications.handlers;
 
-import static com.msm.themes.util.themePreferencia.getProvider;
 import static com.pmam.fcm.notifications.GlobalNotificationBuilder.NOTIFICATION_ID;
 
 import android.content.Context;
@@ -55,22 +54,22 @@ public class BigPictureSocialIntentService extends Worker {
 	@Override
 	public Result doWork() {
 		// Get the provider
-		Context applicationContext = getApplicationContext();
+		handleActionDismiss();
 
-		String provider = getProvider(applicationContext);
+		//String provider = getProvider(applicationContext);
 
 		// Build the action string
-		String action = new StringBuilder()
+		/*String action = new StringBuilder()
 				.append(provider)
 				.append(".notifications.handlers.action.DISMISS")
-				.toString();
+				.toString();*/
 
 		// Check if the intent action matches the dismiss action
-		if (getInputData().getString("action").equals(action)) {
+		/*if (getInputData().getString("action").equals(action)) {
 			handleActionDismiss();
-		}
+		}*/
 		Log.d(TAG, "ACTION_DISMISS(): " + ACTION_DISMISS);
-		Log.d(TAG, "provider(): " + provider);
+		Log.d(TAG, "provider(): ");
 		// Indicate success
 		return Result.success();
 	}
