@@ -4,7 +4,6 @@ android {
     compileSdk 34
     namespace 'com.pmam.libraryfcm'
     defaultConfig {
-        applicationId "com.pmam.libraryfcm"
         minSdkVersion 23  //determina em quais dispositivos o aplicativo pode ser instalado
         targetSdkVersion 34  //ativa o aplicativo para um novo comportamento de tempo de execução
         versionCode 1
@@ -36,7 +35,6 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.7.7'
     implementation 'androidx.navigation:navigation-ui:2.7.7'
     implementation platform('com.google.firebase:firebase-bom:33.1.0')
-    implementation 'com.google.firebase:firebase-core:21.1.1'
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "androidx.work:work-runtime:2.9.0"
