@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 android {
-    compileSdk 34
+    compileSdk 35
     namespace 'com.pmam.libraryfcm'
     defaultConfig {
         minSdkVersion 23  //determina em quais dispositivos o aplicativo pode ser instalado
-        targetSdkVersion 34  //ativa o aplicativo para um novo comportamento de tempo de execução
+        targetSdkVersion 35  //ativa o aplicativo para um novo comportamento de tempo de execução
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -13,10 +13,7 @@ android {
     }
 
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_18
-        targetCompatibility JavaVersion.VERSION_18
-    }
+
 
     buildFeatures{
         dataBinding = true
@@ -30,14 +27,14 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.navigation:navigation-fragment:2.7.7'
-    implementation 'androidx.navigation:navigation-ui:2.7.7'
-    implementation platform('com.google.firebase:firebase-bom:33.1.0')
+    implementation 'androidx.navigation:navigation-fragment:2.9.0'
+    implementation 'androidx.navigation:navigation-ui:2.9.0'
+    implementation platform('com.google.firebase:firebase-bom:33.14.0')
     implementation 'com.google.firebase:firebase-messaging'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation "androidx.work:work-runtime:2.9.0"
-	implementation 'com.github.maycon1038:LibraryThemes:4.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation "androidx.work:work-runtime:2.10.1"
+	implementation 'com.github.maycon1038:LibraryThemes:4.2.0'
     implementation project(':fcm')
 }
